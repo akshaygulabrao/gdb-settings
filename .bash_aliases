@@ -1,1 +1,1 @@
-/root/.bash_aliases
+alias objdump="objdump -M intel"
