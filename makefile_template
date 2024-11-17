@@ -1,0 +1,64 @@
+# Compiler and flags
+CC = gcc
+CXX = g++
+CFLAGS = -Wall -Wextra -O2
+CXXFLAGS = $(CFLAGS)
+LDFLAGS =
+
+# Installation directories
+PREFIX = /usr/local
+INSTALL_BIN = $(PREFIX)/bin
+
+# Directories
+SRC_DIR = src
+BUILD_DIR = build
+BIN_DIR = bin
+
+# Source files and objects
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+
+# Target executable
+TARGET = $(BIN_DIR)/program
+
+# Default target
+all: directories $(TARGET)
+
+# Create necessary directories
+directories:
+	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BIN_DIR)
+
+# Compile source files to object files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Link object files to create executable
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o $@
+
+# Install the program
+install: all
+	@mkdir -p $(INSTALL_BIN)
+	install -m 755 $(TARGET) $(INSTALL_BIN)
+
+# Uninstall the program
+uninstall:
+	rm -f $(INSTALL_BIN)/$(notdir $(TARGET))
+
+# Clean build files
+clean:
+	rm -rf $(BUILD_DIR) $(BIN_DIR)
+
+# Clean and rebuild
+rebuild: clean all
+
+# Run the program
+run: all
+	./$(TARGET)
+
+# Phony targets
+.PHONY: all clean rebuild run directories install uninstall
+
+# Dependencies
+-include $(OBJS:.o=.d)
